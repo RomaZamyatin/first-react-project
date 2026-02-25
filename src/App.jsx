@@ -1,31 +1,74 @@
-import { createElement, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react'
+import styles from './App.module.css'
 import React from 'react'
 
-function App() {
 
-  const [count, setCount] = useState(0)
-  let date = new Date();
-  return (
-	createElement(React.Fragment,null,
-		createElement('div',null,
-			createElement('a', {href: 'https://vite.dev',target:'_blank'},
-				createElement('img',{src:viteLogo,className:'logo',alt:'Vite Logo'})
-			),
-			createElement('a', {href: 'https://react.dev',target:'_blank'},
-				createElement('img',{src:reactLogo,className:'logo react',alt:'React Logo'})
-			)
-		),
-		createElement('h1',null,'Vite + React'),
-		createElement('div',{className:'card'},
-			createElement('button',{onClick:()=>setCount(count+1)},`count is ${count}`),
-			createElement('p',null,`edit `,createElement('code',null,'src/App.jsx'), ` and save to test HMR`),
-		),
-		createElement('p',{className:"read-the-docs"},'Click on the Vite and React logos to learn more'),
-		createElement('p',null,`${date.getFullYear()}`)
-	)
+function App() {
+	const [value,setValue] = useState("")
+	const [list,setList] = useState([])
+	const [error,setError] = useState("")
+	const [valid,setValid] = useState (false)
+
+  	const onInputButtonClick = () => {
+		let promptValue = prompt("Введите значение")
+		console.log(promptValue)
+		if (promptValue.length>=3){
+			setValue(promptValue)
+			setError("")
+			setValid(true)
+		} else {
+			setError("Введенное значение должно содержать минимум 3 символа")
+			setValid(false)
+		}
+	}
+
+	const onAddButtonClick = () => {
+		if (value.length>=3){
+			let id = Date.now()
+
+			const d = new Date();
+
+			const year = d.getFullYear();
+			const month = String(d.getMonth() + 1).padStart(2, '0'); 
+			const day = String(d.getDate()).padStart(2, '0');
+			const hours = String(d.getHours()).padStart(2, '0');
+			const minutes = String(d.getMinutes()).padStart(2, '0');
+			const seconds = String(d.getSeconds()).padStart(2, '0');
+
+			const formattedDate = `${year}.${month}.${day} ${hours}:${minutes}:${seconds}`;
+
+			const updatedList = [...list, { id, value, formattedDate }]
+			setList(updatedList)
+			console.log(list)
+			setValue("")
+			setError("")
+		}
+	}
+
+
+	return (
+	<>
+		<div className={styles.app}>
+    		<h1 className={styles['page-heading']}>Ввод значения</h1>
+    		<p className={styles['no-margin-text']}>
+      		Текущее значение <code>value</code>: "<output className={styles['current-value']}>{value}</output>"
+    		</p>
+			{error!=='' && <div className={styles.error}>{error}</div>}
+			<div className={styles['buttons-container']}>
+				<button className={styles.button} onClick={onInputButtonClick}>Ввести новое</button>
+				<button className={styles.button} disabled={!valid} onClick={onAddButtonClick}>Добавить в список</button>
+			</div>
+			<div div className={styles['list-container']}>
+				<h2 className={styles['list-heading']}>Список:</h2>
+				{list.length == 0 && <p className={styles['no-margin-text']}>Нет добавленных элементов</p>}
+
+				<ul className={styles.list}>
+					{/* <li className={styles['list-item']}>Первый элемент</li> */}
+					{list.map(({id,value,formattedDate})=> <li className={styles['list-item']} key={id}>{value} {formattedDate}</li>)}
+				</ul>
+			</div>
+  		</div>
+	</>
   )
 }
 export default App
